@@ -206,11 +206,13 @@ body{
 }
 
 #total{
-    color: #CCE3C8;
+    color: #3c493a;
     font-weight: 600;
     display: inherit;
     justify-content: center;
     width: 60%;
+    border-left: #b1b1b1 1px solid;
+    border-right: #b1b1b1 1px solid;
 }
 
 .Article{
@@ -357,21 +359,38 @@ body{
 }
 
 #dinars-total{
-    width: 50px;
+    width: 87px;
     font-size:44px ;
-    width: fit-content;
     height: 45px;
     margin: 1px;
+    direction: rtl;
 }
 
 
 #millimes-total{
     font-size:28px ;
-    width: fit-content;
+    width: 60px;
     height:29px ;
     margin: 1px;
 }
 
 #holder{
     display:flex;
+}
+
+
+#total-text{
+    color: #555;
+    align-self: baseline;
+    margin: 5px 0;
+    position: absolute;
+    left: 22%;
+}
+
+.highlighted{
+    color: #e95954;
+}
+
+.colored{
+    background-color: rgb(221, 255, 168);
 }

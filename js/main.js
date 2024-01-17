@@ -64,17 +64,18 @@ window.onload = (event) => {
 
 
 
+
+
+
+
+
 //##############################################################################
 //###################### VARIABLES DECLARATION START ########################### 
 //##############################################################################
 
-inputField=         document.getElementById("input");
-prixField=          document.getElementById("prix");
-articlesField=      document.getElementById("articles");
-inputBox=           document.getElementById("writing");
-totalBox=           document.getElementById("total");
-dinarsTot=          document.getElementById("dinars-total");
-millimTot=          document.getElementById("millimes-total");
+totalBox=       document.getElementById("total");
+dinarsTot=      document.getElementById("dinars-total");
+millimTot=      document.getElementById("millimes-total");
 
 
 screen={
@@ -96,9 +97,9 @@ defaultPrix= {
 defaultArticle= {
 
     state:      "BLUR",  //Possible states["FOCUSED", "BLUR"]
-        mode:       "REPLACE", //Possible states["REPLACE", "APPEND"]
-        value:      "1",
-        numeric:     1,
+    mode:       "REPLACE", //Possible states["REPLACE", "APPEND"]
+    value:      "1",
+    numeric:     1,
 
 }
 
@@ -113,7 +114,7 @@ defaultTotal= {
 input = {
 
     id:         null,
-    state:      "GHOSTED", // Possible states ["GHOSTED","IDDLE", "FOCUSED"]
+    state:      "BLUR", // Possible states ["BLUR","BLUR", "FOCUSED"]
     prix:       {
         state:      "BLUR",    //Possible states["FOCUSED", "BLUR"]
         mode:       "REPLACE",  //Possible states["REPLACE", "APPEND"]
@@ -147,12 +148,29 @@ Total = input.total;
 //##############################################################################
 
 
+
+
+
+
+
+
 //##############################################################################
 //###################### INTERACTING WITH DOM START ############################ 
 //##############################################################################
 
 
-function handleClick(number) {  //HANDLES NUMBERS CLICKS
+function handleScreenClick(screen){ //IF THE SCREEN IS CLICKED WHILE EMPTY, A NEW ELEMENT IS ADDED
+
+    if(screen.children[0].children.length < 2){
+        addField();
+        startEditing(input);
+        startEditing(prix);
+    }
+
+}
+
+
+function handleClick(number) {  //HANDLES NUMBERS CLICKS AN ASSIGN THEIR VALUE TO "ARTICLES" OR "PRIX" DEPENDING ON THE STATE
 
     if (input.state == "FOCUSED" && prix.state == "FOCUSED") {
 
@@ -214,10 +232,10 @@ function backspace() { //HANDLES BACKSPACE TO DELETE TEXT FROM THE FOCUSED TEXT 
 
 function deleteArticle(element){ //DELETES THE CHOSEN ARTICLE
 
-    let ID= Number(element.parentNode.id);
+    let ID= parseInt(element.parentNode.id);
 
     if(ID == input.id){
-        input.id-= 1;
+       // input.id-= 1;
         resetInput();
     }
 
@@ -227,38 +245,42 @@ function deleteArticle(element){ //DELETES THE CHOSEN ARTICLE
 
 }
 
+ 
+async function handleNext() { //EVALUATE THE STATE AND HANDLES PRESSING "NEXT"
 
-function handleNext() { //EVALUATE THE STATE AND HANDLES PRESSING "NEXT"
-
-    if(input.state == "GHOSTED"){
+    if(input.state == "BLUR"){
         addField()
         startEditing(input);
         startEditing(prix);
     }
     else if (prix.state == "FOCUSED" && prix.value!="0") {
-        prix.state = "BLUR"
-        articles.state = "FOCUSED";
+        startEditing(articles);
         stopEditing(prix);
         renderArticles();
     }
     else if (articles.state == "FOCUSED") {
-        articles.state == "BLUR"
-        input.state = "IDDLE";
+        stopEditing(input);
         stopEditing(articles);
         CalcTotal();
+
         if(screen.temp.length != 0){
-            screen.content.map(article => {
-                if(article.id == input.id){
-                    article = JSON.parse(JSON.stringify(input));
+
+            let newVal= deepCopy(input);
+        
+            screen.content.forEach(article => {
+
+                if(article.id== newVal.id){
+                    screen.content.splice(screen.content.indexOf(article),1,newVal)
                 }
-                input= JSON.parse(JSON.stringify(screen.temp[0]));
+                input= deepCopy(screen.temp[0]);
                 articles = input.articles;
                 prix = input.prix;
                 Total = input.total;
-                setTimeout(()=>{screen.temp.splice(0,1)},100);
-                startEditing(input);
-                startEditing(prix)
-                allTotal();
+                setTimeout(()=>{
+                    screen.temp.splice(0,1)
+                    allTotal();
+                },50);
+
             });
         } else {
 
@@ -266,20 +288,93 @@ function handleNext() { //EVALUATE THE STATE AND HANDLES PRESSING "NEXT"
             allTotal();
             addField();
             resetInput();
-            startEditing(input);
-            startEditing(prix);
-        }
 
+        }
+        startEditing(input);
+        startEditing(prix);
     }
 }
 
 
-function handleEdit(element){ //CHNGES THE STATE SO
-    let ID= element.parentNode.id;
-    let toBeLoaded= screen.content.filter((article)=> article.id == ID);
-    input.state= "IDDLE"
-    screen.temp.push(JSON.parse(JSON.stringify(input)));
-    input = JSON.parse(JSON.stringify(toBeLoaded))[0];
+function handleEdit(element){ //CHNGES THE STATE SO THE SELECTED ELEMENT WILL BE HIGHLIGHTED AND EDITABLE
+    
+    stopEditing(input);
+    stopEditing(prix);
+    stopEditing(articles);
+
+    let ID= parseInt(element.parentNode.id); 
+    
+    let selectInContent= screen.content.some((article)=>
+        article.id=== ID
+    );
+
+    let selecInTemp;
+
+    if(screen.temp.length!= 0){
+        selecInTemp= screen.temp.some((article)=>article.id== ID)
+    }
+    else{
+        selecInTemp= false
+    }
+
+    let actInContent= screen.content.some((article)=>
+        article.id== input.id
+    );
+
+
+    if(selectInContent && screen.temp.length== 0){
+        stopEditing(input);
+        stopEditing(prix);
+        stopEditing(articles);
+
+        let newVal= deepCopy(input);
+        let toBeLoaded= screen.content.filter((article)=> article.id == ID)[0];
+        screen.temp.push(newVal);
+        input= deepCopy(toBeLoaded);
+        articles = input.articles
+        prix = input.prix;
+        Total = input.total;
+        startEditing(input);
+        startEditing(prix);
+        allTotal();
+    }
+    else if(selectInContent && actInContent){
+        stopEditing(input);
+        stopEditing(prix);
+        stopEditing(articles);
+
+        let newVal= deepCopy(input);
+        let toBeLoaded= screen.content.filter((article)=> article.id == ID)[0];
+        let toBeReplaced= screen.content.filter((article)=> article.id == input.id)[0];
+        screen.content.splice(screen.content.indexOf(toBeReplaced),1,newVal)
+        input= deepCopy(toBeLoaded);
+        articles = input.articles
+        prix = input.prix;
+        Total = input.total;
+        startEditing(input);
+        startEditing(prix);
+        allTotal();
+    }
+    else if(selecInTemp && actInContent){
+        stopEditing(input);
+        stopEditing(prix);
+        stopEditing(articles);
+
+        let newVal= deepCopy(input);
+        let toBeLoaded= screen.temp[0];
+        let toBeReplaced= screen.content.filter((article)=> article.id == input.id)[0];
+        screen.content.splice(screen.content.indexOf(toBeReplaced),1,newVal)[0];
+        input= deepCopy(toBeLoaded);
+        articles = input.articles
+        prix = input.prix;
+        Total = input.total;
+        setTimeout(()=>{screen.temp.length= 0},100)
+        startEditing(input);
+        startEditing(prix);
+        allTotal();
+
+    }
+
     startEditing(input);
     startEditing(prix);
 }
@@ -308,7 +403,9 @@ function setValue(path, number) { //TESTS HOW TO SET THE VALUE OF THE SPECIFIED 
         path.value += number;
 }
 
-
+function deepCopy(jsonVal){ //CREATE A DEEP COPY (INDEPENDENT COPY) OF A JSON
+   return  JSON.parse(JSON.stringify(jsonVal))
+}
 
 
 
@@ -317,7 +414,7 @@ function resetInput(){ //SETS THE VALUE OF "input" TO DEFAULT VALUES
     input.prix=               JSON.parse(JSON.stringify(defaultPrix));
     input.articles=           JSON.parse(JSON.stringify(defaultArticle));
     input.total=              JSON.parse(JSON.stringify(defaultTotal));
-    input.state=              "GHOSTED";
+    input.state=              "BLUR";
     articles =                input.articles;
     prix =                    input.prix;
     Total =                   input.total;
@@ -333,19 +430,28 @@ function deleteState(ID){   //HELPER FUNCTION FOR "deleteArticle"s FUNCTION THAT
 
 
 function startEditing(element) {
-    element.state = "FOCUSED";
+    if(element.id){
+        element.state = "FOCUSED";
+        highlightField("ON")
+    }
+    else{
+        element.state = "FOCUSED";
+        highlightText(`${element}`);
+
+    }
+    
 }
 
 function stopEditing(element) {
     if(element.id){
-        element.state = "GHOSTED";
+        element.state = "BLUR";
+        highlightField("OFF")
     } 
     else {
         element.state = "BLUR";
         element.mode = "REPLACE";
-    }
-
-    
+        highlightText();
+    }   
 }
 
 
@@ -366,15 +472,15 @@ function makeFloat(value) { //ADDS "." TO "prix.value" WHEN THE USER FORGETS TO 
 function renderPrix() { //RENDERS PRICE VALUE
     
 
-        if (prix.value.includes(".")) {
-            displayPrix(prix.value);
-            prix.numeric = parseFloat(prix.value);
-        }
-        else if (!prix.value.includes(".")) {
-            displayPrix(makeFloat(prix.value));
-            prix.numeric = parseFloat(makeFloat(prix.value));
-        }
-    
+    if (prix.value.includes(".")) {
+        displayPrix(prix.value);
+        prix.numeric = parseFloat(prix.value);
+    }
+    else if (!prix.value.includes(".")) {
+        displayPrix(makeFloat(prix.value));
+        prix.numeric = parseFloat(makeFloat(prix.value));
+    }
+    CalcTotal();    
 };
 
 
@@ -382,12 +488,10 @@ function renderPrix() { //RENDERS PRICE VALUE
 function displayPrix(floatValue) {  //INVOKED BY "renderPrix" TO DISPLAY THE PASSED VALUE IN THE DOM
 
     let ActualEdit= document.getElementById(`${input.id}`)
-
     let dinarBox = ActualEdit.children[1].children[0].children[0];
     let millimBox = ActualEdit.children[1].children[0].children[2].children[1];
-
-
     let splitted = floatValue.split(".");
+
     dinarBox.innerHTML = splitted[0].padStart(1, 0);
     millimBox.innerHTML = splitted[1].padEnd(3, 0);
 }
@@ -395,8 +499,9 @@ function displayPrix(floatValue) {  //INVOKED BY "renderPrix" TO DISPLAY THE PAS
 
 function renderArticles() { //RENDERS ARTICLES VALUE
 
-        displayArticles(articles.value);
-        articles.numeric = parseFloat(articles.value);
+    displayArticles(articles.value);
+    articles.numeric = parseFloat(articles.value);
+    CalcTotal()
 };
 
 
@@ -404,15 +509,18 @@ function displayArticles(value) { //INVOKED BY "renderArticles" TO DISPLAY THE P
 
     let ActualEdit= document.getElementById(`${input.id}`)
     let nombreArticle= ActualEdit.children[1].children[1].children[1];
+
     nombreArticle.innerHTML = value.padStart(2,0)
 };
 
 
 function CalcTotal() { //CALCULATES THE TOTAL OF THE FOCUSED ARTICLE
+
     Total.value = Number((prix.numeric * articles.numeric).toFixed(3));
 };
 
 function allTotal(){ //CALCULATES THE SUM OF TOTALS
+
     screen.total= screen.content.reduce((sum, currentVal)=> sum + currentVal.total.value, 0);
     displayTotal()
 }
@@ -420,11 +528,10 @@ function allTotal(){ //CALCULATES THE SUM OF TOTALS
 function displayTotal() { //INVOKED BY "allTotal" TO DISPLAY THE PASSED VALUE IN THE DOM
 
     let strVal = screen.total.toFixed(3);
-    console.log(strVal);
     let splitted = strVal.split(".");
+
     dinarsTot.innerHTML = splitted[0];
     millimTot.innerHTML = splitted[1].padEnd(3, 0);
-    console.log(screen.total);
 }
 
 
@@ -440,12 +547,55 @@ function addField(){  //INVOKED BY "handleNext" TO PUSH ANOTHER INPUT FIELD IN T
     let template = document.querySelector("template");
     let container = document.querySelector("#Articles");
     let clone = template.content.cloneNode(true);
-
     let elements = clone.querySelectorAll("div");
+
     elements[0].setAttribute("id",`${input.id}`);
     container.appendChild(clone);
 
+}
+
+
+function highlightField(onOff){ //APPLY OR REMOVE ELEMENTS BACKGROUND COLOR DEPENDING ON THEIR STATE
+
+    let elem= document.getElementById(`${input.id}`);
+
+    if (onOff== "ON"){
+        elem?.classList?.add("colored");
+    }
+    else if(onOff== "OFF"){
+        elem?.classList?.remove("colored");
+    }
+    
+}
+
+
+function highlightText(){ //APPLY OR REMOVE TEXT COLOR DEPENDING ON ITS STATE
+
+    let ActualEdit= document.getElementById(`${input.id}`);
+    let dinarBox = ActualEdit?.children[1]?.children[0]?.children[0];
+    let millimBox = ActualEdit?.children[1]?.children[0]?.children[2]?.children[1];
+    let nombreArticle= ActualEdit?.children[1]?.children[1]?.children[1];
+
+    if(prix.state== "FOCUSED" && articles.state== "BLUR"){
+        dinarBox?.classList?.add("highlighted");
+        millimBox?.classList?.add("highlighted");
+        nombreArticle?.classList?.remove("highlighted");
+    }
+    else if(prix.state== "BLUR" && articles.state== "FOCUSED"){
+        dinarBox?.classList?.remove("highlighted");
+        millimBox?.classList?.remove("highlighted");
+        nombreArticle?.classList?.add("highlighted");
+
+    } else{
+        nombreArticle?.classList?.remove("highlighted");
+        dinarBox?.classList?.remove("highlighted");
+        millimBox?.classList?.remove("highlighted");
+    }
+
 
 }
+
+
+
 
 

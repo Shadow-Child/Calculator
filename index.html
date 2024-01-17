@@ -16,14 +16,14 @@
 
         <div id="screen"> <!--SCREEN START-->
 
-            <div id="data-box">
+            <div id="data-box" onclick="handleScreenClick(this)">
                 <div id="Articles">
 
                     <template id="holder">
 
                         <div class="Article"  id="new" >
 
-                            <div class="close" onclick="deleteArticle(this)">x</div>
+                            <div class="close" onclick="event.stopPropagation(); deleteArticle(this)">x</div>
                             <div class="input" onclick="handleEdit(this);">
                                 
                                 <div class="prix">
@@ -58,7 +58,7 @@
 
                 <div id="discard"></div>
                 <div id="total">
-
+                    <div id="total-text">TOTAL</div>
                     <div id="dinars-total"></div>
                     <div class="virgule">,</div>
 
@@ -71,7 +71,7 @@
 
                 <div id="validate"></div>
 
-                <img src="Ressources/Imgs/Polygon 5.svg" id="extend">
+                <img src="/Ressources/Imgs/Polygon 5.svg" id="extend">
 
             </div>
 
