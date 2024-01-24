@@ -3,30 +3,30 @@
 //############################################################################## 
 
 let icons = {
-    calculClassique: {
-        name:           "calculClassique",
-        src:            "./Ressources/Imgs/calculClassique.svg",
-        order:          "1"
+    "calculClassique": {
+        "name": "calculClassique",
+        "src": "./Ressources/Imgs/calculClassique.svg",
+        "order": "1"
     },
-    carnetCredit: {
-        name:           "carnetCredit",
-        src:            "./Ressources/Imgs/carnetCredit.svg",
-        order:          "4"
+    "carnetCredit": {
+        "name": "carnetCredit",
+        "src": "./Ressources/Imgs/carnetCredit.svg",
+        "order": "4"
     },
-    imprimer: {
-        name:           "imprimer",
-        src:            "./Ressources/Imgs/imprimer.svg",
-        order:          "5"
+    "imprimer": {
+        "name": "imprimer",
+        "src": "./Ressources/Imgs/imprimer.svg",
+        "order": "5"
     },
-    reste: {
-        name:           "reste",
-        src:            "./Ressources/Imgs/reste.svg",
-        order:          "3"
+    "reste": {
+        "name": "reste",
+        "src": "./Ressources/Imgs/reste.svg",
+        "order": "3"
     },
-    coller: {
-        name:           "coller",
-        src:            "./Ressources/Imgs/coller.svg",
-        order:          "2"
+    "coller": {
+        "name": "coller",
+        "src": "./Ressources/Imgs/coller.svg",
+        "order": "2"
     }
 };
 
@@ -238,21 +238,29 @@ function deleteArticle(element){ //DELETES THE CHOSEN ARTICLE
         resetInput();
     }
 
+
     deleteState(ID);
     slideDelete(element);
     if(screen.temp.length!=0){
-        input= deepCopy(screen.temp[0]);
-        articles = input.articles;
-        prix = input.prix;
-        Total = input.total;
-        setTimeout(()=>{
-            screen.temp.splice(0,1)
-            allTotal();
-        },50);
+
+        if(ID== screen.temp[0].id){
+            screen.temp= [];
+        }else{
+            input= deepCopy(screen.temp[0]);
+            articles = input.articles;
+            prix = input.prix;
+            Total = input.total;
+            setTimeout(()=>{
+                screen.temp.splice(0,1)
+                allTotal();
+            },50);
+        }
+
         startEditing(input);
-        startEditing(prix)
+        startEditing(prix);
+
     }
-    refreshNumber()
+    refreshNumber();
 
 
 }
@@ -615,6 +623,8 @@ function editArticles(){
 
 
 function refreshNumber(){
+
+    renderNbrArticles()
     let Allnodes = Array.prototype.slice.call(document.getElementById('Articles').children).slice(1);
     let numered= Allnodes.slice(0,Allnodes.length-1)
     numered.forEach((element)=>{
@@ -680,6 +690,33 @@ function swipedetect(el, callback){
     })
 }
 
+function renderNbrArticles(){
+    let number= screen.content.length;
+    let validate= document.getElementById("validate");
+    let discard= document.getElementById("discard")
+
+    if(number > 0){
+        validate.setAttribute("class", "active")
+        discard.setAttribute("class", "active")
+    } else{
+        validate.removeAttribute("class")
+        discard.removeAttribute("class")
+    }
+    let container= document.getElementById("nbrArticles");
+    container.innerHTML= parseFloat(number);
+
+}
+
+function extendScreen(){
+    let myScreen= document.getElementById("screen");
+
+    if(myScreen.hasAttribute("class", "full-screen")){
+        myScreen.removeAttribute("class")
+    }else{
+        myScreen.setAttribute("class", "full-screen")
+    }
+
+}
 
 
 
