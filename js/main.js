@@ -3,30 +3,30 @@
 //############################################################################## 
 
 let icons = {
-    "calculClassique": {
-        "name": "calculClassique",
-        "src": "./Ressources/Imgs/calculClassique.svg",
-        "order": "1"
+    calculClassique: {
+        name:           "calculClassique",
+        src:            "./Ressources/Imgs/calculClassique.svg",
+        order:          "1"
     },
-    "carnetCredit": {
-        "name": "carnetCredit",
-        "src": "./Ressources/Imgs/carnetCredit.svg",
-        "order": "4"
+    carnetCredit: {
+        name:           "carnetCredit",
+        src:            "./Ressources/Imgs/carnetCredit.svg",
+        order:          "4"
     },
-    "imprimer": {
-        "name": "imprimer",
-        "src": "./Ressources/Imgs/imprimer.svg",
-        "order": "5"
+    imprimer: {
+        name:           "imprimer",
+        src:            "./Ressources/Imgs/imprimer.svg",
+        order:          "5"
     },
-    "reste": {
-        "name": "reste",
-        "src": "./Ressources/Imgs/reste.svg",
-        "order": "3"
+    reste: {
+        name:           "reste",
+        src:            "./Ressources/Imgs/reste.svg",
+        order:          "3"
     },
-    "coller": {
-        "name": "coller",
-        "src": "./Ressources/Imgs/coller.svg",
-        "order": "2"
+    coller: {
+        name:           "coller",
+        src:            "./Ressources/Imgs/coller.svg",
+        order:          "2"
     }
 };
 
@@ -235,12 +235,24 @@ function deleteArticle(element){ //DELETES THE CHOSEN ARTICLE
     let ID= parseInt(element.parentNode.id);
 
     if(ID == input.id){
-       // input.id-= 1;
         resetInput();
     }
 
     deleteState(ID);
-    element.parentNode.remove();
+    slideDelete(element);
+    if(screen.temp.length!=0){
+        input= deepCopy(screen.temp[0]);
+        articles = input.articles;
+        prix = input.prix;
+        Total = input.total;
+        setTimeout(()=>{
+            screen.temp.splice(0,1)
+            allTotal();
+        },50);
+        startEditing(input);
+        startEditing(prix)
+    }
+    refreshNumber()
 
 
 }
@@ -323,9 +335,6 @@ function handleEdit(element){ //CHNGES THE STATE SO THE SELECTED ELEMENT WILL BE
 
 
     if(selectInContent && screen.temp.length== 0){
-        stopEditing(input);
-        stopEditing(prix);
-        stopEditing(articles);
 
         let newVal= deepCopy(input);
         let toBeLoaded= screen.content.filter((article)=> article.id == ID)[0];
@@ -335,13 +344,9 @@ function handleEdit(element){ //CHNGES THE STATE SO THE SELECTED ELEMENT WILL BE
         prix = input.prix;
         Total = input.total;
         startEditing(input);
-        startEditing(prix);
         allTotal();
     }
-    else if(selectInContent && actInContent){
-        stopEditing(input);
-        stopEditing(prix);
-        stopEditing(articles);
+    else if(selectInContent && actInContent && input.id!=ID){
 
         let newVal= deepCopy(input);
         let toBeLoaded= screen.content.filter((article)=> article.id == ID)[0];
@@ -352,13 +357,9 @@ function handleEdit(element){ //CHNGES THE STATE SO THE SELECTED ELEMENT WILL BE
         prix = input.prix;
         Total = input.total;
         startEditing(input);
-        startEditing(prix);
         allTotal();
     }
     else if(selecInTemp && actInContent){
-        stopEditing(input);
-        stopEditing(prix);
-        stopEditing(articles);
 
         let newVal= deepCopy(input);
         let toBeLoaded= screen.temp[0];
@@ -370,13 +371,11 @@ function handleEdit(element){ //CHNGES THE STATE SO THE SELECTED ELEMENT WILL BE
         Total = input.total;
         setTimeout(()=>{screen.temp.length= 0},100)
         startEditing(input);
-        startEditing(prix);
         allTotal();
 
     }
 
     startEditing(input);
-    startEditing(prix);
 }
 
 
@@ -538,6 +537,8 @@ function displayTotal() { //INVOKED BY "allTotal" TO DISPLAY THE PASSED VALUE IN
 
 
 function addField(){  //INVOKED BY "handleNext" TO PUSH ANOTHER INPUT FIELD IN THE SCREEN
+    
+    
     if(input.id== null){
         input.id= 1;
     }else{
@@ -550,9 +551,12 @@ function addField(){  //INVOKED BY "handleNext" TO PUSH ANOTHER INPUT FIELD IN T
     let elements = clone.querySelectorAll("div");
 
     elements[0].setAttribute("id",`${input.id}`);
+    swipedetect(elements[0])
     container.appendChild(clone);
-
+    refreshNumber()
+   
 }
+
 
 
 function highlightField(onOff){ //APPLY OR REMOVE ELEMENTS BACKGROUND COLOR DEPENDING ON THEIR STATE
@@ -592,10 +596,97 @@ function highlightText(){ //APPLY OR REMOVE TEXT COLOR DEPENDING ON ITS STATE
         millimBox?.classList?.remove("highlighted");
     }
 
+}
+
+function editPrix(){
+
+    startEditing(input);
+    startEditing(prix);
+    stopEditing(articles);
+}
+
+function editArticles(){
+
+    startEditing(input);
+    stopEditing(prix);
+    startEditing(articles);
 
 }
 
 
+function refreshNumber(){
+    let Allnodes = Array.prototype.slice.call(document.getElementById('Articles').children).slice(1);
+    let numered= Allnodes.slice(0,Allnodes.length-1)
+    numered.forEach((element)=>{
+        let rank= numered.indexOf(element)
+        numered[rank].children[1].children[2].innerHTML=`${rank+1}`
+    })
+}
+
+function slideDelete(element){
+    let box= element.parentElement;
+    box.style.cssText="animation: 0.32s slide-left;background-color: rgb(246, 163, 163);"
+
+    setTimeout(() => {
+        
+        element.parentNode.remove();
+        refreshNumber()
+    }, 300);
+
+}
+
+
+
+function swipedetect(el, callback){
+
+    var touchsurface = el,
+    swipedir,
+    startX,
+    startY,
+    distX,
+    distY,
+    threshold = 150, //required min distance traveled to be considered swipe
+    restraint = 100, // maximum distance allowed at the same time in perpendicular direction
+    allowedTime = 500, // maximum time allowed to travel that distance
+    elapsedTime,
+    startTime
+
+    touchsurface.addEventListener('touchstart', function(e){
+        var touchobj = e.changedTouches[0]
+        swipedir = 'none'
+        dist = 0
+        startX = touchobj.pageX
+        startY = touchobj.pageY
+        startTime = new Date().getTime() // record time when finger first makes contact with surface
+
+    })
+
+    touchsurface.addEventListener('touchmove', function(e){
+    })
+
+    touchsurface.addEventListener('touchend', function(e){
+        var touchobj = e.changedTouches[0]
+        distX = touchobj.pageX - startX // get horizontal dist traveled by finger while in contact with surface
+        distY = touchobj.pageY - startY // get vertical dist traveled by finger while in contact with surface
+        elapsedTime = new Date().getTime() - startTime // get time elapsed
+        if (elapsedTime <= allowedTime){ // first condition for awipe met
+            if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint){ // 2nd condition for horizontal swipe met
+                (distX < 0)? console.log('left') : deleteArticle(el.children[0]) // if dist traveled is negative, it indicates left swipe
+            }
+            else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
+                (distY < 0)? console.log('up') : console.log('down') // if dist traveled is negative, it indicates up swipe
+            }
+        }
+    })
+}
+
+
+
+
+
+
+
+ 
 
 
 
