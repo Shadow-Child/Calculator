@@ -59,8 +59,8 @@ body{
     justify-content: center;
 }
 .calculator{
-    width: 414px;
-    height: 915px;
+    width: 100vw;
+    height: 100vh;
     background: linear-gradient(180deg, #EFEEEE 46.76%, #D6D4D4 91.96%);
     outline: 1px solid black;
     overflow: hidden;
