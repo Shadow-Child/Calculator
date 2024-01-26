@@ -59,6 +59,8 @@ body{
     justify-content: center;
 }
 .calculator{
+    display: grid;
+    grid-template-rows: auto 110vw;
     width: 100vw;
     height: 100vh;
     background: linear-gradient(180deg, #EFEEEE 46.76%, #D6D4D4 91.96%);
@@ -124,10 +126,11 @@ body{
 }
 
 #screen{
+    grid-area: 1/ 1 span;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    height: 45%;
+    min-height: 20vh;
     width:100vw;
     border-bottom-left-radius: 23px;
     border-bottom-right-radius: 23px;
@@ -137,50 +140,53 @@ body{
     margin-bottom: 10px;
     position:relative;
     z-index: 20;
-    transition: height 0.3s ease-out, position 0.5s;
+    transition: min-height 0.3s ease-out, position 0.5s;
 
 }
 
 #screen.full-screen{
-    transition: height 0.3s ease-out, position 0.5s;
-    height: 88vh;
+    transition: min-height 0.3s ease-out, position 0.5s;
+    min-height: 98vh;
+}
+
+.info-bar{
+    height: 10vw;
+    position: absolute;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    border-bottom: solid 1px black;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    align-items: center;
+
 }
 
 
 #keyboard{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    display: grid;
+    /*grid-template-rows: auto 85%;*/
 }
 
 
+.operators{
 
-#num-keys{
-    height: 90%;
-    width: 75%;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 20vw) ;
+    gap: 5vw;
+    width: 90%;
     justify-content: center;
-
-}
-
-#operator-keys{
-    height: 90%;
-    width: fit-content;
-    justify-content: space-around;
-    display: inline-flex;
-    flex-direction: column;
 }
 
 .key{
     text-align: center;
     font-style: normal;
-    line-height: normal; 
-    
-    margin: 10px 10px;
+    line-height: normal;  
+    display: flex;
     align-items: center;
     justify-content: center;
-    display: flex;
     transition: background-color 0.5s ease ;
 }
 
@@ -195,7 +201,7 @@ body{
 }
 
 #extend-container{
-    bottom: -35px;
+    bottom: -25px;
     position: absolute;
     width: 100%;
     text-align: center;
@@ -203,16 +209,18 @@ body{
 }
 
 #extend{
-    height: 30px;
+    height: 20px;
 }
 
 
 #utilities{
     display: flex;
-    height: 60px;
-    width: 100%;
+    max-height: 20vw;
+    width: 100vw;
+    padding: 0 10px;
     justify-content: space-around;
-    margin: 25px 10px 15px ;
+    margin: 15px 0 0 ;
+    display: none;
 }
 
 #utilities img{
@@ -231,9 +239,20 @@ body{
 }
 
 #keys{
-    display: inline-flex;
-    padding: 0 5%;
-    height: fit-content;
+    padding: 30px 15px 20px;
+    display: grid;
+    grid-template-columns: auto 25% ;
+    width: 100vw;
+    gap: 20px;
+}
+
+.nums{
+    grid-column: 1/ 1 span;
+    display: grid;
+    grid-template-columns: repeat(3, 18vw);
+    grid-template-rows: repeat(4, 20vw);
+    row-gap: 5vw;
+    justify-content: space-between;
 }
 
 
@@ -242,8 +261,8 @@ body{
     font-weight: 400;
     font-size: 36px;
     border-radius: 50%;
-    width: 70px;
-    height: 70px;
+    height: 100%;
+    aspect-ratio: 1/1;
     border: #d4d4d4 0.15px solid;
     background: #EEE;
     color: #3d3d3d;
@@ -339,8 +358,7 @@ body{
 
 
 #remise{
-    width: 79px; 
-    height: 70px; 
+    grid-row: 1 / 1 span;
     border-radius: 10px;
     border: 1px solid #000;
     background-color: #FFF;
@@ -354,8 +372,8 @@ body{
 }
 
 #suivant{
-    width: 80px;
-    height: 165px; border-radius: 10px;
+    grid-row: 2 / 2 span;
+    border-radius: 10px;
     border: 0.15px solid #27571F;
     background-color: #CCE3C8;
     font-size: 20px;
@@ -368,8 +386,7 @@ body{
 }
 
 #backspace{
-    width: 80px;
-    height: 70px;
+    grid-row: 4 / 1 span;
     background-color: #eee;
     border-radius: 10px; 
     border: 1px solid ;

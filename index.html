@@ -16,6 +16,11 @@
     <div class="calculator">
 
         <div id="screen"> <!--SCREEN START-->
+            <div class="info-bar">
+                <div class="date">########</div>
+                <div class="time">--:--</div>
+                <div class="num-ticket">#456435468</div>
+            </div>
 
             <div id="data-box" onclick="handleScreenClick(this)">
                 <div id="Articles">
@@ -60,7 +65,7 @@
         
             <div id="total-box">
 
-                <div id="discard">
+                <div id="discard" onclick="clearAll()">
                     <img src="Ressources/Imgs/supprimer ticket.svg">
                 </div>
                 <div id="total">
@@ -88,7 +93,7 @@
 
             </div>
 
-            <div id="extend-container" onclick="extendScreen();">
+            <div id="extend-container">
                 <img src="Ressources/Imgs/extend.svg" id="extend">
             </div>
 
@@ -102,9 +107,7 @@
 
             <div id="utilities"></div>
             <div id="keys">
-
-                <div id="num-keys">
-
+                <div class="nums">
                     <div class="key numeric" >1</div>
                     <div class="key numeric" >2</div>
                     <div class="key numeric" >3</div>
@@ -117,16 +120,15 @@
                     <div class="key numeric" >00</div>
                     <div class="key numeric" >0</div>
                     <div class="key numeric" >.</div>
-
                 </div>
 
-                <div id="operator-keys">
-
+                <div class="operators">
                     <div class="key" id="remise">%</div>
                     <div class="key" id="suivant" onclick="handleNext();">-->]</div>
-                    <div class="key" id="backspace" onclick="backspace();"><---</div>
-
+                    <div class="key" id="backspace" onclick="backspace();"><---</div>    
                 </div>
+                
+
 
             </div>
 

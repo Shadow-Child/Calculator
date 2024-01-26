@@ -53,8 +53,10 @@ function putUtilitiesIcons(icons) {
 
 
 window.onload = (event) => {
+    refreshDate()
     setOnClick();
     putUtilitiesIcons(icons);
+    swipeDownDetect(document.getElementById("extend-container"))
 }
 
 //##############################################################################
@@ -79,6 +81,7 @@ millimTot=      document.getElementById("millimes-total");
 
 
 screen={
+    position:   "SHRUNK", //["SHRUNK", "EXTENDED"]
     content:    [],
     temp:       [],
     total:      null,
@@ -559,7 +562,7 @@ function addField(){  //INVOKED BY "handleNext" TO PUSH ANOTHER INPUT FIELD IN T
     let elements = clone.querySelectorAll("div");
 
     elements[0].setAttribute("id",`${input.id}`);
-    swipedetect(elements[0])
+    swipeLeftDetect(elements[0])
     container.appendChild(clone);
     refreshNumber()
    
@@ -647,7 +650,7 @@ function slideDelete(element){
 
 
 
-function swipedetect(el, callback){
+function swipeLeftDetect(el){
 
     var touchsurface = el,
     swipedir,
@@ -681,7 +684,7 @@ function swipedetect(el, callback){
         elapsedTime = new Date().getTime() - startTime // get time elapsed
         if (elapsedTime <= allowedTime){ // first condition for awipe met
             if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint){ // 2nd condition for horizontal swipe met
-                (distX < 0)? console.log('left') : deleteArticle(el.children[0]) // if dist traveled is negative, it indicates left swipe
+                (distX > 0)? deleteArticle(el.children[0]): "invalid swipe"; // if dist traveled is negative, it indicates left swipe
             }
             else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
                 (distY < 0)? console.log('up') : console.log('down') // if dist traveled is negative, it indicates up swipe
@@ -709,13 +712,22 @@ function renderNbrArticles(){
 
 function extendScreen(){
     let myScreen= document.getElementById("screen");
+    myScreen.setAttribute("class", "full-screen");
+    screen.position="EXTENDED";
+}
 
-    if(myScreen.hasAttribute("class", "full-screen")){
-        myScreen.removeAttribute("class")
-    }else{
-        myScreen.setAttribute("class", "full-screen")
-    }
+function shrinkScreen(){
+    let myScreen= document.getElementById("screen"); 
+    screen.position="SHRUNK";
+    myScreen.removeAttribute("class");
+}
 
+
+function clearAll(){
+    let AllElements = Array.prototype.slice.call(document.getElementById('Articles').children).slice(1);
+    AllElements.forEach(e => {
+        deleteArticle(e.children[0])
+    })
 }
 
 
@@ -723,7 +735,65 @@ function extendScreen(){
 
 
 
- 
+function swipeDownDetect(el){
 
+    var touchsurface = el,
+    swipedir,
+    startX,
+    startY,
+    distX,
+    distY,
+    threshold = 150, //required min distance traveled to be considered swipe
+    restraint = 100, // maximum distance allowed at the same time in perpendicular direction
+    allowedTime = 500, // maximum time allowed to travel that distance
+    elapsedTime,
+    startTime
+
+    touchsurface.addEventListener('touchstart', function(e){
+        var touchobj = e.changedTouches[0]
+        swipedir = 'none'
+        dist = 0
+        startX = touchobj.pageX
+        startY = touchobj.pageY
+        startTime = new Date().getTime() // record time when finger first makes contact with surface
+
+    })
+
+    touchsurface.addEventListener('touchmove', function(e){
+    })
+
+    touchsurface.addEventListener('touchend', function(e){
+        var touchobj = e.changedTouches[0]
+        distX = touchobj.pageX - startX // get horizontal dist traveled by finger while in contact with surface
+        distY = touchobj.pageY - startY // get vertical dist traveled by finger while in contact with surface
+        elapsedTime = new Date().getTime() - startTime // get time elapsed
+        if (elapsedTime <= allowedTime){ // first condition for awipe met
+            if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for horizontal swipe met
+                (distY > 0 && screen.position== "SHRUNK")? extendScreen():(distY < 0 && screen.position== "EXTENDED")? shrinkScreen():"invalid"; // if dist traveled is negative, it indicates left swipe
+            }
+            else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
+                (distY < 0)? console.log('up') : console.log('down') // if dist traveled is negative, it indicates up swipe
+            }
+        }
+    })
+}
+
+
+
+
+ 
+function refreshDate(){
+
+    let date= document.getElementsByClassName("date")[0];
+    console.log(date)
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = mm + '/' + dd + '/' + yyyy;
+    
+    date.innerHTML= today
+}
 
 
