@@ -55,7 +55,7 @@ function putUtilitiesIcons(icons) {
 window.onload = (event) => {
     refreshDate()
     setOnClick();
-    putUtilitiesIcons(icons);
+    //putUtilitiesIcons(icons);
     swipeDownDetect(document.getElementById("extend-container"))
 }
 
