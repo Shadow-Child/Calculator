@@ -18,48 +18,48 @@
         <div id="screen"> <!--SCREEN START-->
             <div class="info-bar">
                 <div class="date">########</div>
-                <div class="time">--:--</div>
+                <div class="time">--:--:--</div>
                 <div class="num-ticket">#456435468</div>
             </div>
 
             <div id="data-box" onclick="handleScreenClick(this)">
-                <div id="Articles">
 
-                    <template id="holder">
+                <template id="holder">
 
-                        <div class="Article"  id="new" >
+                    <div class="Article"  id="new" >
 
-                            <div class="close" onclick="event.stopPropagation(); deleteArticle(this)">x</div>
-                            <div class="input" onmousedown="handleEdit(this);">
+                        <div class="close" onclick="event.stopPropagation(); deleteArticle(this); setTimeout(()=>render(), 300)">x</div>
+                        <div class="input">
+                            
+                            <div class="prix" onmouseup="editPrix(this)">
+                                <div class="dinars-box" ></div>
                                 
-                                <div class="prix" onmouseup="editPrix()">
-                                    <div class="dinars-box" ></div>
-                                    
-                                    <div class="virgule">,</div>
-                                        <div>
-                                            <div class="devise">DT</div>
-                                            <div class="millimes-box"></div>
-                                        </div>
+                                <div class="virgule">,</div>
+                                    <div>
+                                        <div class="devise">DT</div>
+                                        <div class="millimes-box"></div>
+                                    </div>
 
-                                </div>
-                            
-                            
-
-                                <div class="nArticles" onmouseup="editArticles()">
-
-                                    <div class="multiply">X</div>
-                                    <div class="nombre_articles"></div>
-                                    
-                                </div>
-                                <div class="rank" >&#9664</div>
                             </div>
+                        
+                        
 
+                            <div class="nArticles" onmouseup="editArticles(this)">
 
-
+                                <div class="multiply">X</div>
+                                <div class="nombre_articles"></div>
+                                
+                            </div>
+                            <div class="rank" >&#9664</div>
                         </div>
 
-                    </template>
-                </div>
+
+
+                    </div>
+
+                </template>
+
+                <div id="Articles"></div>
 
             </div>
         
@@ -86,7 +86,7 @@
 
 
                 </div>
-                <div id="validate">
+                <div id="validate" onclick="validateTicket()">
                     <div id="nbrArticles">0</div>
                     <img src="/Ressources/Imgs/prosceed.svg">
                 </div>
@@ -133,6 +133,7 @@
             </div>
 
         </div> <!--KEYBOARD END-->
+        </div>
     </div>
 
     <script src="js/main.js"></script>
